@@ -4,6 +4,8 @@ import axios from 'axios';
 import querystring from 'querystring';
 import { createSession, getSession } from '../sessionStore.js';
 
+import User from '../model/user.js';
+
 const router = express.Router();
 
 const CLIENT_ID = process.env.CLIENT_ID;
@@ -65,7 +67,7 @@ router.get('/callback', async (req, res) => {
 
         const { access_token, refresh_token } = response.data;
 
-        console.log("Tokens : ", access_token, refresh_token);
+        console.log("Tokens : ", access_token, "refresh-Token", refresh_token);
 
         res
             .cookie('access_token',access_token, { httpOnly : true})
@@ -78,6 +80,17 @@ router.get('/callback', async (req, res) => {
 
         console.log('Session Id : ', sessionId)
 
+        const newUser = await User.create(
+            {   
+                // userName : 'SpotifyUser',
+                access_token : access_token,
+                refresh_token : refresh_token,
+                session_id : sessionId
+            }
+        )
+
+        console.log('New User : ', newUser)
+
         res.redirect(`http://localhost:5173/login-success?session=${sessionId}`)
 
     } catch (error) {
@@ -87,7 +100,7 @@ router.get('/callback', async (req, res) => {
 });
 
 
-router.get('/session', (res, req) => {
+router.get('/session', (req, res) => {
     const session = req.query;
 
     if(!session) { 
@@ -137,7 +150,7 @@ router.get('/refresh', async ( req, res ) => {
             headers : {
                 Authorization : 
                 'Basic ' + 
-                Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toSorted('base64'),
+                Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64'),
                 'Content-Type' : 'application/x-www-form-urlencoded'
             }
            }
@@ -153,5 +166,35 @@ router.get('/refresh', async ( req, res ) => {
         res.status(500).json({ error: "Failed to refresh token" });
     }
 });
+
+
+router.get('/me', async ( req, res ) => {
+
+    const sessionId = req.query.session;
+
+    if ( !sessionId ) {
+        return res.status(401).json(
+            {
+                error : "Unauthorized Access - Missing Session Id"
+            }
+        )
+    }
+
+    const sessionData = getSession(sessionId);
+
+    if ( !sessionData ) {
+        return res.status(401).json(
+            {
+                error : "Unauthorized Access - Missing Session Data"
+            }
+        )
+    }
+
+    res.status(200).json(
+        {
+            massage : "Authorized Access"
+        }
+    )
+})
 
 export default router;

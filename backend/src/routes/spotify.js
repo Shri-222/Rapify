@@ -1,4 +1,7 @@
 
+import express from 'express'
+
+const router = express.Router();
 
 router.get('/me', async (req, res) => {
     const access_token = req.headers.authorization?.split(' ')[1];

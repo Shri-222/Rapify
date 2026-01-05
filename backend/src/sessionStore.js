@@ -1,8 +1,10 @@
 
+import crypto from 'crypto';
+
 const session = {};
 
 export const createSession = (data) => {
-    const id = Math.random().toString(36).substring(2, 15);
+    const id = crypto.randomUUID();
     session[id] = data;
     return id;
 }

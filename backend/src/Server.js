@@ -7,6 +7,8 @@ import cookieParser from 'cookie-parser'
 import authRoutes from './routes/auth.js'
 import spotifyRoutes from './routes/spotify.js'
 
+import { DBConnect } from './database/database.js';
+
 const app = express()
 
 app.use(cors());
@@ -23,3 +25,5 @@ app.get('/', (req, res) => {
 app.listen(8000, () => {
     console.log('Server Is Running On Port 8000');
 })
+
+DBConnect();
