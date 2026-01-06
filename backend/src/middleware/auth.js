@@ -1,8 +1,9 @@
-import { getSession } from "../sessionStore";
 
-const requestAuth = ( req, res, next ) => {
+import { getSession } from "../sessionStore.js";
 
-    const sessionId = req.cookies.session_id;
+const verifySession = ( req, res, next ) => {
+
+    const sessionId = req.query.session;
 
     if(!sessionId) {
         return res.status(401).json({ error : 'Unauthorized' });
@@ -14,7 +15,9 @@ const requestAuth = ( req, res, next ) => {
         return res.status(401).json({ error : 'Unauthorized' });
     }
 
-    res.sessionData = sessionData;
+    req.sessionData = sessionData;
 
     next();
 }
+
+export default verifySession;

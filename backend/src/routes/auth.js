@@ -3,9 +3,13 @@ import express from 'express';
 import axios from 'axios';
 import querystring from 'querystring';
 import { createSession, getSession } from '../sessionStore.js';
+import 'dotenv/config'
+
+import verifySession from '../middleware/auth.js';
 
 import User from '../model/user.js';
 
+const SPOTIFY_BASE_API = process.env.SPOTIFY_BASE_API
 const router = express.Router();
 
 const CLIENT_ID = process.env.CLIENT_ID;
@@ -101,7 +105,7 @@ router.get('/callback', async (req, res) => {
 
 
 router.get('/session', (req, res) => {
-    const session = req.query;
+    const session = req.query.session;
 
     if(!session) { 
         return res.status(400).json({
@@ -122,7 +126,6 @@ router.get('/session', (req, res) => {
         refresh_token: data.refresh_token
     })
 });
-
 
 
 router.get('/refresh', async ( req, res ) => {
@@ -167,34 +170,31 @@ router.get('/refresh', async ( req, res ) => {
     }
 });
 
+router.get('/me', verifySession,  async ( req, res ) => {
+    
+   try {
 
-router.get('/me', async ( req, res ) => {
+    const me = await axios.get(
+        `${SPOTIFY_BASE_API}/me`,
 
-    const sessionId = req.query.session;
-
-    if ( !sessionId ) {
-        return res.status(401).json(
-            {
-                error : "Unauthorized Access - Missing Session Id"
-            }
-        )
-    }
-
-    const sessionData = getSession(sessionId);
-
-    if ( !sessionData ) {
-        return res.status(401).json(
-            {
-                error : "Unauthorized Access - Missing Session Data"
-            }
-        )
-    }
-
-    res.status(200).json(
         {
-            massage : "Authorized Access"
+            headers : {
+                Authorization : `Bearer ${req.sessionData.access_token}`
+            }
+        }
+    );
+
+    return res.json(me.data);
+    
+   } catch (error) {
+    console.error( error.response || error );
+    return res.status(401).json(
+        {
+            error : "Failed to fetch user Profile"
         }
     )
+   }
 })
+
 
 export default router;
