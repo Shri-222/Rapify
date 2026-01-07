@@ -3,8 +3,6 @@ import express from 'express';
 import axios from 'axios';
 import querystring from 'querystring';
 import { createSession, getSession } from '../sessionStore.js';
-import 'dotenv/config'
-
 import verifySession from '../middleware/auth.js';
 
 import User from '../model/user.js';

@@ -1,13 +1,14 @@
 
 import express from 'express'
-import 'dotenv/config'
 import verifySession from '../middleware/auth.js';
 import axios from 'axios';
+import validateTimeRange from '../middleware/validateTimeRange.js';
+import validatePagination from '../middleware/validatePagination.js';
 
 const router = express.Router();
 const SPOTIFY_BASE_API = process.env.SPOTIFY_BASE_API
 
-router.get('/top-artists', verifySession, async ( req, res ) => {
+router.get('/top-artists', verifySession, validatePagination, validateTimeRange, async ( req, res ) => {
 
     try {
         
@@ -16,6 +17,12 @@ router.get('/top-artists', verifySession, async ( req, res ) => {
             {
                 headers : {
                     Authorization : `Bearer ${req.sessionData.access_token}`
+                },
+
+                params : {
+                    time_range : req.time_range,
+                    limit : req.limit,
+                    offset : req.offset
                 }
             }
         )
@@ -24,7 +31,7 @@ router.get('/top-artists', verifySession, async ( req, res ) => {
 
     } catch (error) {
         console.error( error.response || error );
-        return res.status(401).json(
+        return res.status(400).json(
             {
                 error : "Failed to fetch user Top Artists"
             }
@@ -32,7 +39,7 @@ router.get('/top-artists', verifySession, async ( req, res ) => {
     }
 })
 
-router.get('/top-tracks', verifySession, async ( req, res ) => {
+router.get('/top-tracks', verifySession, validatePagination, validateTimeRange, async ( req, res ) => {
 
     try {
         
@@ -41,6 +48,12 @@ router.get('/top-tracks', verifySession, async ( req, res ) => {
             {
                 headers : {
                     Authorization : `Bearer ${req.sessionData.access_token}`
+                },
+
+                params : {
+                    time_range : req.time_range,
+                    limit : req.limit,
+                    offset : req.offset
                 }
             }
         )
@@ -49,9 +62,44 @@ router.get('/top-tracks', verifySession, async ( req, res ) => {
 
     } catch (error) {
         console.error( error.response || error );
-        return res.status(401).json(
+        return res.status(400).json(
             {
                 error : "Failed to fetch user Top Tracks"
+            }
+        )
+    }
+})
+
+router.get('/recently-played', verifySession, validatePagination, async ( req, res ) => {
+
+    const { before, after } = req.query;
+
+    try {
+        
+        const response = await axios.get(
+            `${SPOTIFY_BASE_API}/me/player/recently-played`,
+
+            {
+                headers : {
+                    Authorization : `Bearer ${req.sessionData.access_token}`
+                },
+
+                params : {
+                    limit : req.limit,
+                    ...( before && { before } ),
+                    ...( after && { after } )
+                }
+            }
+
+        )
+
+        return res.json(response.data);
+
+    } catch (error) {
+        console.error( error.response || error );
+        return res.status(400).json(
+            {
+                error : "Failed to fetch user Recently Played Tracks"
             }
         )
     }
