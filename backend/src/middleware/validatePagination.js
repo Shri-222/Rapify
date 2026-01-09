@@ -6,27 +6,28 @@ const validatePagination = ( req, res, next ) => {
     const MAX_LIMIT = 50;
     const DEFAULT_OFFSET = 0;
     
-    let { limit, offset } = req.query;
+    let limitRaw = req.query.limit;
+    let offsetRaw = req.query.offset;
 
-    let Limit = parseInt( Limit );
-    let Offset = parseInt( Offset );
+    let limit = parseInt( limitRaw );
+    let offset = parseInt( offsetRaw );
 
-    if( !Limit ) {
-        limit = LIMIT;
+        // LIMIT
+    if (!Number.isFinite(limit) || limit <= 0) {
+        limit = DEFAULT_LIMIT;
+    } else if (limit > MAX_LIMIT) {
+        limit = MAX_LIMIT;
+    } else {
+        limit = Math.floor(limit);
+    }
+
+    // OFFSET
+    if (!Number.isFinite(offset) || offset < 0) {
+        offset = DEFAULT_OFFSET;
+    } else {
+        offset = Math.floor(offset);
     }
     
-    if ( !Offset ) {
-        offset = 0;
-    }
-
-    if ( Limit >= MAX_LIMIT ) {
-        limit = MAX_LIMIT;
-    }
-
-    if ( Offset <= 0 ) {
-        offset = DEFAULT_OFFSET;
-    }
-
     req.pagination = { limit, offset };
 
     next();
