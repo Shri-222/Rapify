@@ -3,7 +3,7 @@ const validateTimeRange  = ( req , res, next ) => {
 
     const allowedRanges = [ 'short_term','medium_term','long_term'];
 
-    const {time_range}  = req.query || 'medium_term';
+    let {time_range}  = req.query || 'medium_term';
 
     if ( !time_range ) { 
         time_range = 'medium_term';

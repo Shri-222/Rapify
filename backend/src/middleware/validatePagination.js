@@ -2,7 +2,7 @@
 
 const validatePagination = ( req, res, next ) => {
 
-    const LIMIT = 20;
+    const DEFAULT_LIMIT = 20;
     const MAX_LIMIT = 50;
     const DEFAULT_OFFSET = 0;
     

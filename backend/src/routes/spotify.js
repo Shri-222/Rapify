@@ -4,6 +4,7 @@ import verifySession from '../middleware/auth.js';
 import axios from 'axios';
 import validateTimeRange from '../middleware/validateTimeRange.js';
 import validatePagination from '../middleware/validatePagination.js';
+import validateRecentlyPlayedCursor from '../middleware/validateRecentlyPlayedCursor.js';
 
 const router = express.Router();
 const SPOTIFY_BASE_API = process.env.SPOTIFY_BASE_API
@@ -70,39 +71,36 @@ router.get('/top-tracks', verifySession, validatePagination, validateTimeRange, 
     }
 })
 
-router.get('/recently-played', verifySession, validatePagination, async ( req, res ) => {
+router.get('/recently-played', verifySession, validateRecentlyPlayedCursor, async ( req, res ) => {
 
-    const { before, after } = req.query;
+        try {
+            
+            const response = await axios.get(
+                `${SPOTIFY_BASE_API}/me/player/recently-played`,
 
-    try {
-        
-        const response = await axios.get(
-            `${SPOTIFY_BASE_API}/me/player/recently-played`,
+                {
+                    headers : {
+                        Authorization : `Bearer ${req.sessionData.access_token}`
+                    },
 
-            {
-                headers : {
-                    Authorization : `Bearer ${req.sessionData.access_token}`
-                },
-
-                params : {
-                    limit : req.limit,
-                    ...( before && { before } ),
-                    ...( after && { after } )
+                    params : {
+                        limit : req.limit,
+                        ...req.cursor
+                    }
                 }
-            }
 
-        )
+            )
 
-        return res.json(response.data);
+            return res.json(response.data);
 
-    } catch (error) {
-        console.error( error.response || error );
-        return res.status(400).json(
-            {
-                error : "Failed to fetch user Recently Played Tracks"
-            }
-        )
-    }
+        } catch (error) {
+            console.error( error.response || error );
+            return res.status(400).json(
+                {
+                    error : "Failed to fetch user Recently Played Tracks"
+                }
+            )
+        }
 })
 
 export default router;
