@@ -3,21 +3,18 @@ import mongoose from 'mongoose';
 
 const userSchema  = new mongoose.Schema ({
 
+    userId : {
+        type : String,
+        unique : true,
+    },
+
     userName : {
         type : String,
     },
 
-    access_token : {
-        type : String,
-    }, 
-    
     refresh_token : {
         type : String,
     },
-
-    session_id : {
-        type : String,
-    }
 
 })
 

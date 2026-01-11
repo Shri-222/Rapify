@@ -3,7 +3,7 @@ import { getSession } from "../sessionStore.js";
 
 const verifySession = ( req, res, next ) => {
 
-    const sessionId = req.query.session;
+    const sessionId = req.cookies?.session_id;
 
     if(!sessionId) {
         return res.status(401).json({ error : 'Unauthorized' });

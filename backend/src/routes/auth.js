@@ -67,33 +67,67 @@ router.get('/callback', async (req, res) => {
             }
         );
 
-        const { access_token, refresh_token } = response.data;
+        const { access_token, refresh_token, expires_in } = response.data;
 
-        console.log("Tokens : ", access_token, "refresh-Token", refresh_token);
-
-        res
-            .cookie('access_token',access_token, { httpOnly : true})
-            .cookie('refresh_token', refresh_token, { httpOnly : true})
-
-        const sessionId = createSession({
-            access_token,
-            refresh_token
-        });
-
-        console.log('Session Id : ', sessionId)
-
-        const newUser = await User.create(
-            {   
-                // userName : 'SpotifyUser',
-                access_token : access_token,
-                refresh_token : refresh_token,
-                session_id : sessionId
+        // Fetch user Profile to store additional info by user 
+        
+        const me = await axios.get(
+            `${SPOTIFY_BASE_API}/me`,
+            {
+                headers : {
+                    Authorization : `Bearer ${access_token}`
+                }
             }
         )
 
-        console.log('New User : ', newUser)
+        // console.log('me : ', me.data)
 
-        res.redirect(`http://localhost:5173/login-success?session=${sessionId}`)
+        const spotifyId = me.data?.id
+
+        if ( !spotifyId ) {
+            return res.status(400).send('Failed to retrieve Spotify User ID');
+        }
+
+        const sessionId = createSession({
+            access_token,
+            spotifyId,
+            expires_in
+        });
+
+        res.cookie(
+            'session_id',
+            sessionId,
+            {
+                httpOnly : true,
+                sameSite : 'lax',
+                secure : false,
+                path : '/'
+            }
+        )
+
+        // console.log('Session Id : ', sessionId)
+
+        const user = await User.findOne({ userId : spotifyId });
+
+        if ( !user ) {
+            const newUser = new User({
+                userId : spotifyId,
+                userName : me.data?.display_name,
+                refresh_token : refresh_token
+            });
+
+            await newUser.save();
+            console.log('newUser : ', newUser)
+        }
+        else {
+            if ( refresh_token !== undefined ) {
+                user.refresh_token = refresh_token;
+                await user.save();
+            }
+            
+        }
+
+        res.redirect(`http://localhost:5173/login-success`)
 
     } catch (error) {
         console.log('Callback Error : ', error);
@@ -103,15 +137,15 @@ router.get('/callback', async (req, res) => {
 
 
 router.get('/session', (req, res) => {
-    const session = req.query.session;
+    const sessionId = req.cookies?.session_id;
 
-    if(!session) { 
+    if(!sessionId) { 
         return res.status(400).json({
             error : "Missing Session Id"
         })
     };
 
-    const data = getSession(session);
+    const data = getSession(sessionId);
 
     if(!data) {
         return res.status(400).json({
