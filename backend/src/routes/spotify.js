@@ -5,11 +5,12 @@ import axios from 'axios';
 import validateTimeRange from '../middleware/validateTimeRange.js';
 import validatePagination from '../middleware/validatePagination.js';
 import validateRecentlyPlayedCursor from '../middleware/validateRecentlyPlayedCursor.js';
+import refreshTokenValidate from '../middleware/refreshToken.js';
 
 const router = express.Router();
 const SPOTIFY_BASE_API = process.env.SPOTIFY_BASE_API
 
-router.get('/top-artists', verifySession, validatePagination, validateTimeRange, async ( req, res ) => {
+router.get('/top-artists', verifySession, refreshTokenValidate, validatePagination, validateTimeRange, async ( req, res ) => {
 
     try {
         
@@ -40,7 +41,7 @@ router.get('/top-artists', verifySession, validatePagination, validateTimeRange,
     }
 })
 
-router.get('/top-tracks', verifySession, validatePagination, validateTimeRange, async ( req, res ) => {
+router.get('/top-tracks', verifySession, refreshTokenValidate, validatePagination, validateTimeRange, async ( req, res ) => {
 
     try {
         
@@ -71,7 +72,7 @@ router.get('/top-tracks', verifySession, validatePagination, validateTimeRange, 
     }
 })
 
-router.get('/recently-played', verifySession, validateRecentlyPlayedCursor, async ( req, res ) => {
+router.get('/recently-played', verifySession, refreshTokenValidate, validateRecentlyPlayedCursor, async ( req, res ) => {
 
         try {
             

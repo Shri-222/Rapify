@@ -1,24 +1,24 @@
 import axios from "axios";
-import { createSession } from "../sessionStore";
-import User from "../model/user";
+import { destroySession } from "../utility/sessionStore.js";
+import User from "../model/user.js";
 
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 
 const refreshTokenValidate = async ( req, res, next ) => {
 
-    const sessionData = req.sessionData;
+    const session = req.session;
 
     const currentTime = Date.now();
 
-    if ( currentTime < sessionData.expires_in ) {
+    if ( currentTime < session.sessionData.expires_at ) {
         next();
     }
     else {
 
         try {
 
-            const user = await User.findOne({ userId : sessionData.spotifyId });
+            const user = await User.findOne({ userId : session.sessionData.spotifyId });
 
             if ( !user ) {
                 return res.status(401).json({ error : 'Unauthorized' });
@@ -44,7 +44,7 @@ const refreshTokenValidate = async ( req, res, next ) => {
                 {
                     headers : {
                         Authorization : 
-                        'Bearer ' + 
+                        'Basic ' + 
                         Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64'),
                         'Content-Type' : 'application/x-www-form-urlencoded'
                     }
@@ -54,39 +54,31 @@ const refreshTokenValidate = async ( req, res, next ) => {
 
             const { access_token, expires_in, refresh_token } = response.data;
 
-            const sessionId = createSession(
-                {
-                    access_token,
-                    spotifyId : sessionData.spotifyId,
-                    expires_in 
-                }
-            )
+            const expires_at = Date.now() + expires_in * 1000;
 
-            res.cookies(
-                'session_id',
-                sessionId,
-            {
-                httpOnly : true,
-                sameSite : 'lax',
-                secure : false,
-                path : '/'
-            }
-            )
+            // update session data 
+            req.session.sessionData.spotifyId = sessionData.spotifyId;
+            req.session.sessionData.access_token = access_token;
+            req.session.sessionData.expires_at = expires_at;
+            
 
-            if ( refresh_Token ) {
+            if ( refresh_token ) {
                 User.updateOne(
                     { userId : sessionData.spotifyId },
-                    { refresh_token : refresh_Token }
+                    { refresh_token : refresh_token }
                 )
             }
 
+            next();
 
         } catch (error) {
-            
+            destroySession( session.sessionId );
+            res.clearCookie('session_id');
+            return res.status(401).json({
+                error : 'Failed to refresh Token'
+            });
         }
     }
-    
-    next();
 }
 
 export default refreshTokenValidate;

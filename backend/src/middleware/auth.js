@@ -1,5 +1,5 @@
 
-import { getSession } from "../sessionStore.js";
+import { getSession } from "../utility/sessionStore.js";
 
 const verifySession = ( req, res, next ) => {
 
@@ -15,7 +15,7 @@ const verifySession = ( req, res, next ) => {
         return res.status(401).json({ error : 'Unauthorized' });
     }
 
-    req.sessionData = sessionData;
+    req.session = { sessionId, sessionData };
 
     next();
 }

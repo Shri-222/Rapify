@@ -2,8 +2,11 @@
 import express from 'express';
 import axios from 'axios';
 import querystring from 'querystring';
-import { createSession, getSession } from '../sessionStore.js';
+import { createSession, getSession } from '../utility/sessionStore.js';
 import verifySession from '../middleware/auth.js';
+import refreshTokenValidate from '../middleware/refreshToken.js';
+
+import buildSpotifyAuthURL from '../utility/auth.js';
 
 import User from '../model/user.js';
 
@@ -14,27 +17,11 @@ const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = process.env.REDIRECT_URI;
 
-    console.log("Redirect Url : ", REDIRECT_URI)
-    console.log("Client ID : ", CLIENT_ID)
-    console.log("Client secret  : ", CLIENT_SECRET)
-
  //login redirect to spotify accounts service
 
 router.get('/login', (req, res) => {
-    const scope = [
-        'user-read-private',
-        'user-read-email',
-        'user-top-read',
-        'user-read-recently-played'
-    ].join(' ');
 
-    const queryParser = querystring.stringify({
-        response_type : 'code',
-        client_id : CLIENT_ID,
-        scope : scope,
-        redirect_uri : REDIRECT_URI,
-        show_dialog : true
-    });
+    const queryParser = buildSpotifyAuthURL({ CLIENT_ID, REDIRECT_URI });
 
     res.redirect(`https://accounts.spotify.com/authorize?${queryParser}`);
 });
@@ -67,7 +54,8 @@ router.get('/callback', async (req, res) => {
             }
         );
 
-        const { access_token, refresh_token, expires_in } = response.data;
+        const { access_token, refresh_token } = response.data;
+        const expires_at = Date.now() + response.data.expires_in * 1000;
 
         // Fetch user Profile to store additional info by user 
         
@@ -91,7 +79,7 @@ router.get('/callback', async (req, res) => {
         const sessionId = createSession({
             access_token,
             spotifyId,
-            expires_in
+            expires_at
         });
 
         res.cookie(
@@ -202,7 +190,7 @@ router.get('/refresh', async ( req, res ) => {
     }
 });
 
-router.get('/me', verifySession,  async ( req, res ) => {
+router.get('/me', verifySession, refreshTokenValidate,  async ( req, res ) => {
     
    try {
 

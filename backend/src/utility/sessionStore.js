@@ -10,3 +10,9 @@ export const createSession = (data) => {
 }
 
 export const getSession = (id) => session[id];
+
+export const destroySession  = ( id ) => {
+
+    delete session[id];
+    
+}
