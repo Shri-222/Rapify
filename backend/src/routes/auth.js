@@ -93,7 +93,7 @@ router.get('/callback', async (req, res) => {
             }
         )
 
-        // console.log('Session Id : ', sessionId)
+        console.log('Session Id : ', sessionId)
 
         const user = await User.findOne({ userId : spotifyId });
 
@@ -192,6 +192,8 @@ router.get('/refresh', async ( req, res ) => {
 
 router.get('/me', verifySession, refreshTokenValidate,  async ( req, res ) => {
     
+    console.log('access Token ', req.session.sessionData.access_token)
+
    try {
 
     const me = await axios.get(
@@ -199,7 +201,7 @@ router.get('/me', verifySession, refreshTokenValidate,  async ( req, res ) => {
 
         {
             headers : {
-                Authorization : `Bearer ${req.sessionData.access_token}`
+                Authorization : `Bearer ${req.session.sessionData.access_token}`
             }
         }
     );
