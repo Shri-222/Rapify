@@ -115,7 +115,7 @@ router.get('/callback', async (req, res) => {
             
         }
 
-        res.redirect(`http://localhost:5173/login-success`)
+        res.redirect(`login-success`)
 
     } catch (error) {
         console.log('Callback Error : ', error);

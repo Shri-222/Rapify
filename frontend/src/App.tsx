@@ -2,11 +2,11 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
-import { useContext } from "react";
-import { AuthContext } from "./auth/AuthProvider.jsx";
+import useAuth from "./auth/useAuth.ts";
+import LoginSuccess from './pages/LoginSuccess.jsx'
 
 function App() {
-  const { user, isLoading } = useContext(AuthContext);
+  const { user, isLoading } = useAuth();
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -24,6 +24,8 @@ function App() {
 
       {/* Public route */}
       <Route path="/login" element={<Login />} />
+
+      <Route path="/login-success" element={<LoginSuccess />} />
 
       {/* Protected route */}
       <Route
