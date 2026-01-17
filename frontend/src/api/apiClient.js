@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const apiClient = axios.create({
-    baseURL : 'http://localhost:8000',
+    baseURL : 'https://never-subintegumental-gavyn.ngrok-free.dev',
     withCredentials : true,
 })
 

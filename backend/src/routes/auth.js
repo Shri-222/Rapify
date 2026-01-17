@@ -82,18 +82,20 @@ router.get('/callback', async (req, res) => {
             expires_at
         });
 
-        res.cookie(
+        const options = {
+            httpOnly : true,
+            secure  : true,
+            sameSite: 'none',
+            path : '/'
+        }
+
+        res
+            .status(200)
+            .cookie(
             'session_id',
             sessionId,
-            {
-                httpOnly : true,
-                sameSite : 'lax',
-                secure : false,
-                path : '/'
-            }
+            options
         )
-
-        console.log('Session Id : ', sessionId)
 
         const user = await User.findOne({ userId : spotifyId });
 
@@ -115,7 +117,7 @@ router.get('/callback', async (req, res) => {
             
         }
 
-        res.redirect(`login-success`)
+        res.redirect('http://localhost:5173/login-success')       
 
     } catch (error) {
         console.log('Callback Error : ', error);
