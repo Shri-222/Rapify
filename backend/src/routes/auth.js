@@ -194,7 +194,6 @@ router.get('/refresh', async ( req, res ) => {
 
 router.get('/me', verifySession, refreshTokenValidate,  async ( req, res ) => {
     
-    console.log('access Token ', req.session.sessionData.access_token)
 
    try {
 

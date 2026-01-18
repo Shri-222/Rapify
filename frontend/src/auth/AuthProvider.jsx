@@ -3,14 +3,9 @@ import React, { createContext } from "react";
 import { useState, useEffect } from "react";
 import apiClient from '../api/apiClient.js'
 
-    type AuthContextType = {
-        user: any | null;          // keep it any for now, you can tighten later
-        isLoading: boolean;
-        isAuthenticated: boolean;
-        setUser: React.Dispatch<React.SetStateAction<any | null>>;
-    };
+export const AuthContext = createContext();
 
-const AuthProvider = ({ children } : { children : React.ReactNode }) => {
+const AuthProvider = ({ children }) => {
 
     const [user, setUser] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -37,12 +32,14 @@ const AuthProvider = ({ children } : { children : React.ReactNode }) => {
         
    }, []);
 
-    const value: AuthContextType = {
+    const value = {
             user,
             isLoading,
             isAuthenticated: !!user,
             setUser,
-        };
+    }
+
+    // console.log('user : ', user)
 
     return (
         <AuthContext.Provider value={ value } >
@@ -53,4 +50,4 @@ const AuthProvider = ({ children } : { children : React.ReactNode }) => {
 }
 
 export default AuthProvider;
-export const AuthContext = createContext<AuthContextType | null>(null);
+
