@@ -7,7 +7,8 @@ const buildSpotifyAuthURL = ( { CLIENT_ID, REDIRECT_URI } ) => {
         'user-read-private',
         'user-read-email',
         'user-top-read',
-        'user-read-recently-played'
+        'user-read-recently-played',
+        'user-library-read'
     ].join(' ');
     
     return querystring.stringify({

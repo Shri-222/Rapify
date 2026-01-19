@@ -18,10 +18,11 @@ router.get('/top-artists', verifySession, refreshTokenValidate, validatePaginati
             `${SPOTIFY_BASE_API}/me/top/artists`,
             {
                 headers : {
-                    Authorization : `Bearer ${req.sessionData.access_token}`
+                    Authorization : `Bearer ${req.session.sessionData.access_token}`
                 },
 
                 params : {
+                    ids : req.session.sessionData.spotifyId,
                     time_range : req.time_range,
                     limit : req.limit,
                     offset : req.offset
@@ -41,6 +42,7 @@ router.get('/top-artists', verifySession, refreshTokenValidate, validatePaginati
     }
 })
 
+
 router.get('/top-tracks', verifySession, refreshTokenValidate, validatePagination, validateTimeRange, async ( req, res ) => {
 
     try {
@@ -49,7 +51,41 @@ router.get('/top-tracks', verifySession, refreshTokenValidate, validatePaginatio
             `${SPOTIFY_BASE_API}/me/top/tracks`,
             {
                 headers : {
-                    Authorization : `Bearer ${req.sessionData.access_token}`
+                    Authorization : `Bearer ${req.session.sessionData.access_token}`
+                },
+
+                params : {
+                    ids : req.session.sessionData.spotifyId,
+                    time_range : req.time_range,
+                    limit : req.limit,
+                    offset : req.offset
+                }
+            }
+        )
+
+        return res.json(response.data);
+
+    } catch (error) {
+        console.error( error.response || error );
+        return res.status(400).json(
+            {
+                error : "Failed to fetch user Top Tracks"
+            }
+        )
+    }
+})
+
+router.get('/tracks', verifySession, refreshTokenValidate, validatePagination, validateTimeRange, async ( req, res ) => {
+
+    console.log('access token : ', req.session.sessionData.access_token)
+
+    try {
+        
+        const response = await axios.get(
+            `${SPOTIFY_BASE_API}/me/tracks`,
+            {
+                headers : {
+                    Authorization : `Bearer ${req.session.sessionData.access_token}`
                 },
 
                 params : {
@@ -81,7 +117,7 @@ router.get('/recently-played', verifySession, refreshTokenValidate, validateRece
 
                 {
                     headers : {
-                        Authorization : `Bearer ${req.sessionData.access_token}`
+                        Authorization : `Bearer ${req.session.sessionData.access_token}`
                     },
 
                     params : {

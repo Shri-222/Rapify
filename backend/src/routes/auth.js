@@ -125,31 +125,6 @@ router.get('/callback', async (req, res) => {
     }
 });
 
-
-router.get('/session', (req, res) => {
-    const sessionId = req.cookies?.session_id;
-
-    if(!sessionId) { 
-        return res.status(400).json({
-            error : "Missing Session Id"
-        })
-    };
-
-    const data = getSession(sessionId);
-
-    if(!data) {
-        return res.status(400).json({
-            error : "Missing Session Id"
-        })
-    };
-
-    return res.json({
-        access_token: data.access_token,
-        refresh_token: data.refresh_token
-    })
-});
-
-
 router.get('/refresh', async ( req, res ) => {
 
     const refresh_token = req.query;
