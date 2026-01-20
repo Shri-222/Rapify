@@ -2,6 +2,7 @@
 import { Avatar, AvatarFallback } from "@radix-ui/react-avatar"
 import { Button } from "./ui/button"
 import { LogOut } from 'lucide-react'
+import { AvatarImage } from "./ui/avatar"
 
 const TopBar = ({title, image}) => {
   return (
@@ -10,7 +11,8 @@ const TopBar = ({title, image}) => {
 
           <div className="flex items-center gap-4">
             <Avatar>
-              <AvatarFallback>{image}</AvatarFallback>
+              <AvatarImage src={image}/>
+              <AvatarFallback></AvatarFallback>
             </Avatar>
 
             <Button variant="outline" size="lg">

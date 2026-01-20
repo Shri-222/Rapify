@@ -77,8 +77,6 @@ router.get('/top-tracks', verifySession, refreshTokenValidate, validatePaginatio
 
 router.get('/tracks', verifySession, refreshTokenValidate, validatePagination, validateTimeRange, async ( req, res ) => {
 
-    console.log('access token : ', req.session.sessionData.access_token)
-
     try {
         
         const response = await axios.get(

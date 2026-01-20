@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { BarChart3, User, Settings, LogOut } from "lucide-react";
 import useAuth from "@/auth/useAuth";
 import TopBar from "@/components/topBar";
@@ -14,14 +14,37 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import ShowTracks from "@/components/ShowTracks";
+import DetailShow from "@/components/DetailShow";
 
 export default function Dashboard() {
 
-  const { user } = useAuth()
+  const { user, artists, tracks } = useAuth()
   const [ type, setType ] = useState('normal') 
 
+  const [ viewTracks, setViewTracks] = useState(false)
+  const [ viewArtists, setViewArtists] = useState(false)
+
   return (
-    <div className="w-[98%] mx-auto">
+    <div className="w-[98%] mx-auto relative">
+
+        {
+          viewTracks && (
+            <div className=" absolute z-10">
+              <DetailShow data={tracks} titles={'Top-Tracks'} Click={setViewTracks}/>
+            </div>
+          )
+        }
+
+        {
+          viewArtists && (
+            <div className="absolute z-10 ">
+              <DetailShow data={artists} titles={'Top-Artists'} Click={setViewArtists} />
+            </div>
+          )
+        }
+
+
       <TopBar title='Dashboard' image={user.images}/>
   
     <div className=" w-full bg-gray-400 p-4 mx-auto">
@@ -78,18 +101,40 @@ export default function Dashboard() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2 text-sm">
-                <li className="p-2 bg-gray-100 rounded">Logged in successfully</li>
-                <li className="p-2 bg-gray-100 rounded">Fetched Spotify data</li>
-                <li className="p-2 bg-gray-100 rounded">Updated profile</li>
-              </ul>
-            </CardContent>
-          </Card>
+
+          <ShowTracks artists={ artists } Click={setViewArtists}/>
+
+          <div>
+            <Card>
+                <CardHeader>
+                <CardTitle>Top Tracks</CardTitle>
+                </CardHeader>
+
+                <CardContent className={'relative'}>
+                    <div className="grid md:grid-cols-2 gap-4">
+                        {tracks?.data?.items?.slice(0, 7).map((track) => (
+                        <div key={track.id} className="flex flex-row gap-5 items-center">
+                            <Avatar className="w-12 h-12">
+                            <AvatarImage src={track?.album?.images?.[0]?.url} />
+                            <AvatarFallback>
+                                {track.name?.charAt(0)}
+                            </AvatarFallback>
+                            </Avatar>
+
+                            <div>
+                                <p className="mt-2 text-lg w-24 overflow-hidden text-ellipsis whitespace-nowrap">{track?.name}</p>
+                            </div>
+                            
+                        </div>
+                        ))}
+                    </div>
+
+                    <Button className={'mt-5 absolute right-28 bottom-1'} onClick={ () => setViewTracks(true) }>
+                        View More
+                    </Button>
+                </CardContent>
+            </Card>
+          </div>
         </div>
 
       </div>

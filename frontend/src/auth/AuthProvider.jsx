@@ -42,7 +42,7 @@ const AuthProvider = ({ children }) => {
                 const artistes = await apiClient.get('/spotify/top-artists')
                 setArtists(artistes);
                 
-                const tracks = await apiClient.get('/spotify/tracks');
+                const tracks = await apiClient.get('/spotify/top-tracks');
                 setTracks(tracks)
                 
             } catch (error) {
@@ -57,13 +57,15 @@ const AuthProvider = ({ children }) => {
 
     const value = {
             user,
+            artists,
+            tracks,
             isLoading,
             isAuthenticated: !!user,
             setUser,
     }
     
-        console.log('artist : ', artists)
-        console.log('Tracks : ', tracks)
+        // console.log('artist : ', artists)
+        // console.log('Tracks : ', tracks)
 
     // console.log('user : ', user)
 
