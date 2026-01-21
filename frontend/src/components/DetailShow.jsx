@@ -1,19 +1,22 @@
+import { useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { Button } from "./ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
 
 
 
-const DetailShow = ({ data, titles, Click}) => {
+const DetailShow = ({ data, titles, Click, callPage}) => {
 
     console.log('data : ', data)
+    
+    const [ offset, setOffset ] = useState(0) 
 
   return (
     <div>
          <Card>
-                <CardHeader>
+                {/* <CardHeader>
                 <CardTitle>{titles}</CardTitle>
-                </CardHeader>
+                </CardHeader> */}
 
                 <CardContent className={'relative'}>
                     <div className="grid md:grid-cols-2 gap-4">
@@ -34,9 +37,30 @@ const DetailShow = ({ data, titles, Click}) => {
                         ))}
                     </div>
 
-                    <Button className={'mt-8 '} onClick={() => Click(false)} >
-                       Close
-                    </Button>
+                    <div className="">
+                        {
+                            offset !== 0 && (
+                                <Button className={'mt-8 '} onClick={() => {
+                                    setOffset(offset-20);
+                                    callPage(offset)
+                                }}> 
+                                    Privies 
+                                </Button>
+                            )
+                        }
+
+                        <Button className={'mt-8 mx-20 '} onClick={() => Click(false)} >
+                            Close
+                        </Button>
+
+                        <Button className={'mt-8'} onClick={() => {
+                             setOffset(offset+20);
+                             callPage(offset)
+                        }}>
+                            Next
+                        </Button>
+                    </div>
+
                 </CardContent>
             </Card>
     </div>

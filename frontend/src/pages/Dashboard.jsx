@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -16,22 +16,58 @@ import {
 } from "@/components/ui/dropdown-menu"
 import ShowTracks from "@/components/ShowTracks";
 import DetailShow from "@/components/DetailShow";
+import apiClient from "@/api/apiClient";
 
 export default function Dashboard() {
 
   const { user, artists, tracks } = useAuth()
-  const [ type, setType ] = useState('normal') 
+
+  const [ type, setType ] = useState('normal')
+  const [ newArtists, setNewArtists ] = useState([])
+  const [ newTracks, setNewTracks ] = useState([]);
 
   const [ viewTracks, setViewTracks] = useState(false)
   const [ viewArtists, setViewArtists] = useState(false)
+
+  useEffect(() => {
+    if (artists) {
+      setNewArtists(artists)
+    }
+
+    if (tracks) {
+      setNewTracks(tracks)
+    }
+  }, [tracks, artists]);
+
+  
+    useEffect(() => {
+      const callTracksPagination = async( {offset} ) => {
+      try {
+        
+        const res = await apiClient.get('/spotify/top-tracks', {
+                                                                  params: {
+                                                                    limit,
+                                                                    offset : offset
+                                                                  }
+                                                                })
+                                                              
+        setNewTracks(res.data)
+
+      } catch (error) {
+          console.log('error : ', error)
+      } 
+    }
+  })
 
   return (
     <div className="w-[98%] mx-auto relative">
 
         {
           viewTracks && (
-            <div className=" absolute z-10">
-              <DetailShow data={tracks} titles={'Top-Tracks'} Click={setViewTracks}/>
+            <div className=" fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+              <div className="">
+                <DetailShow data={newTracks} titles={'Top-Tracks'} Click={setViewTracks} callPage={callTracksPagination}/>
+              </div>
             </div>
           )
         }
@@ -39,7 +75,7 @@ export default function Dashboard() {
         {
           viewArtists && (
             <div className="absolute z-10 ">
-              <DetailShow data={artists} titles={'Top-Artists'} Click={setViewArtists} />
+              <DetailShow data={newArtists} titles={'Top-Artists'} Click={setViewArtists} />
             </div>
           )
         }
@@ -102,7 +138,7 @@ export default function Dashboard() {
 
         <div className="grid md:grid-cols-2 gap-4">
 
-          <ShowTracks artists={ artists } Click={setViewArtists}/>
+          <ShowTracks artists={ newArtists } Click={setViewArtists}/>
 
           <div>
             <Card>
@@ -112,7 +148,7 @@ export default function Dashboard() {
 
                 <CardContent className={'relative'}>
                     <div className="grid md:grid-cols-2 gap-4">
-                        {tracks?.data?.items?.slice(0, 7).map((track) => (
+                        {newTracks?.data?.items?.slice(0, 7).map((track) => (
                         <div key={track.id} className="flex flex-row gap-5 items-center">
                             <Avatar className="w-12 h-12">
                             <AvatarImage src={track?.album?.images?.[0]?.url} />

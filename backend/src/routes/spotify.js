@@ -22,7 +22,6 @@ router.get('/top-artists', verifySession, refreshTokenValidate, validatePaginati
                 },
 
                 params : {
-                    ids : req.session.sessionData.spotifyId,
                     time_range : req.time_range,
                     limit : req.limit,
                     offset : req.offset
@@ -55,7 +54,6 @@ router.get('/top-tracks', verifySession, refreshTokenValidate, validatePaginatio
                 },
 
                 params : {
-                    ids : req.session.sessionData.spotifyId,
                     time_range : req.time_range,
                     limit : req.limit,
                     offset : req.offset
