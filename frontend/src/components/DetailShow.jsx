@@ -5,66 +5,74 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
 
 
 
-const DetailShow = ({ data, titles, Click, callPage}) => {
+const DetailShow = ({ songs, nextData, Click, callPage }) => {
+  const [offset, setOffset] = useState(0);
 
-    console.log('data : ', data)
-    
-    const [ offset, setOffset ] = useState(0) 
+  console.log("songs :", songs)
+
+  const next = offset + 20;
+  const prev = offset - 20;
+
+  if (offset < 0) return null;
 
   return (
-    <div>
-         <Card>
-                {/* <CardHeader>
-                <CardTitle>{titles}</CardTitle>
-                </CardHeader> */}
+    <Card className="h-[95vh] flex flex-col">
+      
+      {/* HEADER (optional) */}
+      <div className="p-4 border-b">
+        <h2 className="text-xl font-semibold">Top Tracks</h2>
+      </div>
 
-                <CardContent className={'relative'}>
-                    <div className="grid md:grid-cols-2 gap-4">
-                        {data?.data?.items?.map((track) => (
-                        <div key={track.id} className="flex flex-row gap-5 items-center">
-                            <Avatar className="w-12 h-12">
-                            <AvatarImage src={track?.album?.images?.[0]?.url} />
-                            <AvatarFallback>
-                                {track.name?.charAt(0)}
-                            </AvatarFallback>
-                            </Avatar>
+      {/* SCROLLABLE CONTENT */}
+      <CardContent className="flex-1 overflow-y-auto">
+        <div className="grid md:grid-cols-2 gap-4">
+          {songs.map((song) => (
+            <div key={song.id} className="flex gap-5 items-center">
+              <Avatar className="w-12 h-12">
+                <AvatarImage src={song?.album?.images?.[0]?.url} />
+                <AvatarImage src={song?.images?.[0]?.url} />
+                <AvatarFallback>
+                  {song.name?.charAt(0)}
+                </AvatarFallback>
+              </Avatar>
 
-                            <div>
-                                <p className="mt-2 text-lg">{track?.name}</p>
-                            </div>
-                            
-                        </div>
-                        ))}
-                    </div>
+              <p className="text-lg">{song?.name}</p>
+            </div>
+          ))}
+        </div>
+      </CardContent>
 
-                    <div className="">
-                        {
-                            offset !== 0 && (
-                                <Button className={'mt-8 '} onClick={() => {
-                                    setOffset(offset-20);
-                                    callPage(offset)
-                                }}> 
-                                    Privies 
-                                </Button>
-                            )
-                        }
+      {/* FOOTER (always visible) */}
+      <div className="p-4 border-t flex justify-between items-center">
+        {offset !== 0 ? (
+          <Button
+            onClick={() => {
+              setOffset(prev);
+              callPage(prev);
+            }}
+          >
+            Previous
+          </Button>
+        ) : <div />}
 
-                        <Button className={'mt-8 mx-20 '} onClick={() => Click(false)} >
-                            Close
-                        </Button>
+        <Button variant="destructive" onClick={() => Click(false)}>
+          Close
+        </Button>
 
-                        <Button className={'mt-8'} onClick={() => {
-                             setOffset(offset+20);
-                             callPage(offset)
-                        }}>
-                            Next
-                        </Button>
-                    </div>
+        {nextData !== null ? (
+          <Button
+            onClick={() => {
+              setOffset(next);
+              callPage(next);
+            }}
+          >
+            Next
+          </Button>
+        ) : <div />}
+      </div>
+    </Card>
+  );
+};
 
-                </CardContent>
-            </Card>
-    </div>
-  )
-}
 
 export default DetailShow

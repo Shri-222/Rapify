@@ -25,39 +25,55 @@ export default function Dashboard() {
   const [ type, setType ] = useState('normal')
   const [ newArtists, setNewArtists ] = useState([])
   const [ newTracks, setNewTracks ] = useState([]);
+  const [ next, setNext ] = useState(undefined)
 
   const [ viewTracks, setViewTracks] = useState(false)
   const [ viewArtists, setViewArtists] = useState(false)
 
   useEffect(() => {
     if (artists) {
-      setNewArtists(artists)
+      setNewArtists(artists.data.items)
     }
 
     if (tracks) {
-      setNewTracks(tracks)
+      setNewTracks(tracks.data.items)
     }
   }, [tracks, artists]);
 
-  
-    useEffect(() => {
-      const callTracksPagination = async( {offset} ) => {
+    const callTracksPagination = async( offset ) => {
       try {
         
         const res = await apiClient.get('/spotify/top-tracks', {
                                                                   params: {
-                                                                    limit,
+                                                                    limit : 20,
                                                                     offset : offset
                                                                   }
                                                                 })
                                                               
-        setNewTracks(res.data)
+        setNewTracks(res.data.items)
+        setNext(res.data.next)
+      } catch (error) {
+          console.log('error : ', error)
+      } 
+    };
 
+    const callArtistsPagination = async( offset ) => {
+
+      try {
+        
+        const res = await apiClient.get('/spotify/top-artists', {
+                                                                  params: {
+                                                                    limit : 20,
+                                                                    offset : offset
+                                                                  }
+                                                                })
+                                                              
+        setNewArtists(res.data.items)
+        setNext(res.data.next)
       } catch (error) {
           console.log('error : ', error)
       } 
     }
-  })
 
   return (
     <div className="w-[98%] mx-auto relative">
@@ -65,8 +81,8 @@ export default function Dashboard() {
         {
           viewTracks && (
             <div className=" fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-              <div className="">
-                <DetailShow data={newTracks} titles={'Top-Tracks'} Click={setViewTracks} callPage={callTracksPagination}/>
+              <div className="w-full max-w-4xl px-4">
+                <DetailShow songs={newTracks} titles={'Top-Tracks'} Click={setViewTracks} callPage={callTracksPagination} nextData={next}/>
               </div>
             </div>
           )
@@ -74,8 +90,10 @@ export default function Dashboard() {
 
         {
           viewArtists && (
-            <div className="absolute z-10 ">
-              <DetailShow data={newArtists} titles={'Top-Artists'} Click={setViewArtists} />
+            <div className=" fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+              <div className="w-full max-w-4xl px-4">
+                <DetailShow songs={newArtists} titles={'Top-Artists'} Click={setViewArtists} callPage={callArtistsPagination} nextData={next}/>
+              </div>
             </div>
           )
         }
@@ -92,7 +110,8 @@ export default function Dashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Avatar className={'w-40 h-40'}>
-                  <AvatarFallback> {user.images} </AvatarFallback>
+                    <AvatarImage src={user.images?.[0]?.url} />
+                    <AvatarFallback>{user.display_name?.charAt(0)}</AvatarFallback>
                 </Avatar> 
                 
                 <CardContent className={'flex flex-col items-start'}>
@@ -148,7 +167,7 @@ export default function Dashboard() {
 
                 <CardContent className={'relative'}>
                     <div className="grid md:grid-cols-2 gap-4">
-                        {newTracks?.data?.items?.slice(0, 7).map((track) => (
+                        {newTracks.slice(0, 7).map((track) => (
                         <div key={track.id} className="flex flex-row gap-5 items-center">
                             <Avatar className="w-12 h-12">
                             <AvatarImage src={track?.album?.images?.[0]?.url} />

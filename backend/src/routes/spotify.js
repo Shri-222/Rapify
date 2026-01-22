@@ -23,8 +23,8 @@ router.get('/top-artists', verifySession, refreshTokenValidate, validatePaginati
 
                 params : {
                     time_range : req.time_range,
-                    limit : req.limit,
-                    offset : req.offset
+                    limit : req.pagination.limit,
+                    offset : req.pagination.offset
                 }
             }
         )
@@ -55,8 +55,8 @@ router.get('/top-tracks', verifySession, refreshTokenValidate, validatePaginatio
 
                 params : {
                     time_range : req.time_range,
-                    limit : req.limit,
-                    offset : req.offset
+                    limit : req.pagination.limit,
+                    offset : req.pagination.offset
                 }
             }
         )
@@ -86,8 +86,8 @@ router.get('/tracks', verifySession, refreshTokenValidate, validatePagination, v
 
                 params : {
                     time_range : req.time_range,
-                    limit : req.limit,
-                    offset : req.offset
+                    limit : req.pagination.limit,
+                    offset : req.pagination.offset
                 }
             }
         )

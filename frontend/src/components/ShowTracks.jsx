@@ -15,7 +15,7 @@ const ShowTracks = ( { artists, Click } ) => {
 
                 <CardContent className={'relative'}>
                     <div className="grid md:grid-cols-2 gap-4">
-                        {artists?.data?.items?.slice(0, 7).map((artist) => (
+                        {artists.slice(0, 7).map((artist) => (
                         <div key={artist.id} className="flex flex-row gap-5 items-center">
                             <Avatar className="w-12 h-12">
                             <AvatarImage src={artist.images?.[0]?.url} />

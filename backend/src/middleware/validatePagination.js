@@ -12,6 +12,7 @@ const validatePagination = ( req, res, next ) => {
     let limit = parseInt( limitRaw );
     let offset = parseInt( offsetRaw );
 
+
         // LIMIT
     if (!Number.isFinite(limit) || limit <= 0) {
         limit = DEFAULT_LIMIT;
