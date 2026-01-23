@@ -20,15 +20,21 @@ import apiClient from "@/api/apiClient";
 
 export default function Dashboard() {
 
-  const { user, artists, tracks } = useAuth()
-
+  const [analysis, setAnalysis] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [open, setOpen] = useState(false);
   const [ type, setType ] = useState('normal')
+
   const [ newArtists, setNewArtists ] = useState([])
   const [ newTracks, setNewTracks ] = useState([]);
   const [ next, setNext ] = useState(undefined)
 
   const [ viewTracks, setViewTracks] = useState(false)
   const [ viewArtists, setViewArtists] = useState(false)
+  const { user, artists, tracks } = useAuth()
+
+ 
 
   useEffect(() => {
     if (artists) {
@@ -74,6 +80,31 @@ export default function Dashboard() {
           console.log('error : ', error)
       } 
     }
+
+    const handleAnalyze = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // 1️⃣ Prepare data
+        await apiClient.post("/tellMe/analysis/prepare");
+
+        // 2️⃣ Get analysis
+        const res = await apiClient.post("/tellMe/analysis/listening", {
+          type,
+        });
+
+        setAnalysis(res.data.analysis);
+        setOpen(true); // open modal
+        console.log('ChatGPT respons : ', res.data)
+
+      } catch (err) {
+        setError("Failed to analyze your listening habits");
+      } finally {
+        setLoading(false);
+      }
+    };
+
 
   return (
     <div className="w-[98%] mx-auto relative">
@@ -149,7 +180,7 @@ export default function Dashboard() {
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              <Button className="mt-6 w-full ">Tell Me</Button>
+              <Button className="mt-6 w-full " onClick={handleAnalyze}>Tell Me</Button>
             </CardContent>
           </Card>
 

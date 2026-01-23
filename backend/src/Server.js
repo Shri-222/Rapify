@@ -8,6 +8,7 @@ import cookieParser from 'cookie-parser'
 
 import authRoutes from './routes/auth.js'
 import spotifyRoutes from './routes/spotify.js'
+import whatTells from './routes/whatTells.js'
 
 import { DBConnect } from './database/database.js';
 
@@ -25,6 +26,7 @@ app.use(cors(
 
 app.use('/auth', authRoutes);
 app.use('/spotify', spotifyRoutes);
+app.use('/tellMe', whatTells)
 
 
 app.listen(PORT, () => {

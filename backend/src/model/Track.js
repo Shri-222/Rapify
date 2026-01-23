@@ -1,7 +1,7 @@
 
 import mongoose from 'mongoose';
 
-export const Tracks = new mongoose.Schema({
+const TracksSchema = new mongoose.Schema({
     spotifyTrackId: String,
     name: String,
     artists: [String],
@@ -16,3 +16,5 @@ export const Tracks = new mongoose.Schema({
         tempo: Number
     }
 })
+
+export default mongoose.model("Tracks", TracksSchema);

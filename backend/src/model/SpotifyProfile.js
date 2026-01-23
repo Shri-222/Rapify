@@ -1,8 +1,13 @@
 
 import mongoose from 'mongoose';
 
-export const SpotifyProfile = new mongoose.Schema({
-    userId: ObjectId,
+const SpotifyProfileSchema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+        index: true,
+    },
     spotifyUserId: String,
     displayName: String,
     country: String,
@@ -10,3 +15,5 @@ export const SpotifyProfile = new mongoose.Schema({
     accountType: String, // free / premium
     createdAt: Date
 })
+
+export default mongoose.model("SpotifyProfile", SpotifyProfileSchema);

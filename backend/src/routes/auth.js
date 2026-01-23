@@ -76,27 +76,6 @@ router.get('/callback', async (req, res) => {
             return res.status(400).send('Failed to retrieve Spotify User ID');
         }
 
-        const sessionId = createSession({
-            access_token,
-            spotifyId,
-            expires_at
-        });
-
-        const options = {
-            httpOnly : true,
-            secure  : true,
-            sameSite: 'none',
-            path : '/'
-        }
-
-        res
-            .status(200)
-            .cookie(
-            'session_id',
-            sessionId,
-            options
-        )
-
         const user = await User.findOne({ userId : spotifyId });
 
         if ( !user ) {
@@ -116,6 +95,29 @@ router.get('/callback', async (req, res) => {
             }
             
         }
+
+        
+        const sessionId = createSession({
+            access_token,
+            userMongoId: user._id,
+            spotifyId,
+            expires_at
+        });
+
+        const options = {
+            httpOnly : true,
+            secure  : true,
+            sameSite: 'none',
+            path : '/'
+        }
+
+        res
+            .status(200)
+            .cookie(
+            'session_id',
+            sessionId,
+            options
+        )
 
         res.redirect('http://localhost:5173/login-success')       
 

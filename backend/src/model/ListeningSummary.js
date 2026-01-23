@@ -1,8 +1,13 @@
 
 import mongoose from 'mongoose';
 
-export const ListeningSummary = new mongoose.Schema({
-    userId: ObjectId,
+const ListeningSummarySchema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+        index: true,
+    },
     timeRange: String, // short_term / medium_term / long_term
 
     totals: {
@@ -30,3 +35,5 @@ export const ListeningSummary = new mongoose.Schema({
 
     generatedAt: Date
 })
+
+export default mongoose.model("ListeningSummary", ListeningSummarySchema);
