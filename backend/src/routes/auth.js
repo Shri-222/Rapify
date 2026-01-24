@@ -78,15 +78,17 @@ router.get('/callback', async (req, res) => {
 
         const user = await User.findOne({ userId : spotifyId });
 
+        console.log("user find by spotify id :", user)
+
         if ( !user ) {
-            const newUser = new User({
+            user = new User({
                 userId : spotifyId,
                 userName : me.data?.display_name,
                 refresh_token : refresh_token
             });
 
-            await newUser.save();
-            console.log('newUser : ', newUser)
+            await user.save();
+            console.log('newUser : ', user)
         }
         else {
             if ( refresh_token !== undefined ) {

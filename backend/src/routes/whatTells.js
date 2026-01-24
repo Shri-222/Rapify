@@ -22,7 +22,7 @@ router.post(
     try {
       const { time_range = "medium_term" } = req.time_range;
 
-      console.log("session USERID : ", req.session.sessionData.spotifyId, req.session.sessionData.access_token)
+      console.log("session USERID : ", req.session.sessionData.spotifyId, req.session.sessionData.access_token, userMongoId)
 
       if (!req.time_range || !time_range) {
         return res.status(400).json({ error: "time_range missing" });
