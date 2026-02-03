@@ -28,6 +28,10 @@ app.use('/auth', authRoutes);
 app.use('/spotify', spotifyRoutes);
 app.use('/tellMe', whatTells)
 
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
 
 app.listen(PORT, () => {
     console.log(`Server Is Running On http://localhost:${PORT} `);
