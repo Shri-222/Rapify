@@ -13,7 +13,7 @@ import whatTells from './routes/whatTells.js'
 import { DBConnect } from './database/database.js';
 
 const app = express()
-const PORT = 8000;
+const PORT = process.env.PORT;
 
 app.use(express.json());
 app.use(cookieParser());

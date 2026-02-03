@@ -2,11 +2,12 @@
 const CRITICAL_THRESHOLD = 0.7;
 
 export function buildListeningSummary({
-  profile,
-  tracks = [],
-  artists = [],
+  sanitized,
   mode = "normal",
 }) {
+
+  const { profile, tracks, artists } = sanitized;
+
   if (!tracks.length || !artists.length) {
     return null;
   }

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { BarChart3, User, Settings, LogOut } from "lucide-react";
 import useAuth from "@/auth/useAuth";
 import TopBar from "@/components/topBar";
 import {
@@ -17,9 +16,13 @@ import {
 import ShowTracks from "@/components/ShowTracks";
 import DetailShow from "@/components/DetailShow";
 import apiClient from "@/api/apiClient";
+import { SpinnerButton } from "@/components/SpinnerButton";
+import MDEditor from "@uiw/react-md-editor";
+
 
 export default function Dashboard() {
 
+  const [showAnalysis, setShowAnalysis] = useState(false);
   const [analysis, setAnalysis] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -82,21 +85,23 @@ export default function Dashboard() {
     }
 
     const handleAnalyze = async () => {
+
+      setShowAnalysis(true);
+
       try {
         setLoading(true);
         setError(null);
 
-        // 1️⃣ Prepare data
+        //Prepare data
         await apiClient.post("/tellMe/analysis/prepare");
 
-        // 2️⃣ Get analysis
+        //Get analysis
         const res = await apiClient.post("/tellMe/analysis/listening", {
           type,
         });
 
         setAnalysis(res.data.analysis);
-        setOpen(true); // open modal
-        console.log('ChatGPT respons : ', res.data)
+        setOpen(true); 
 
       } catch (err) {
         setError("Failed to analyze your listening habits");
@@ -110,8 +115,76 @@ export default function Dashboard() {
     <div className="w-[98%] mx-auto relative">
 
         {
+          loading && (
+            <div onClick={() => setOpen(false)} className=" fixed inset-0 z-50 flex items-center justify-center bg-black/40" >
+                <SpinnerButton/>
+              </div>
+          )
+        }
+
+        {
+          showAnalysis && analysis && (
+            <div
+              onClick={() => setOpen(false)}
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+            >
+              <div
+                onClick={() => {
+                  setShowAnalysis(false);
+                  setAnalysis("");
+                }}
+                className="
+                  w-full max-w-4xl
+                  max-h-[90vh]
+                  bg-white
+                  rounded-2xl
+                  px-6 py-6
+                  overflow-y-auto
+                  no-scrollbar
+                "
+              >
+                <MDEditor.Markdown
+                  source={analysis}
+                  className="prose prose-lg max-w-none"
+                  style={{ whiteSpace: "pre-wrap" }}
+                />
+              </div>
+            </div>
+          )
+        }
+
+        {
+          type === 'critical' && open && (
+            <div onClick={() => setOpen(false)} className=" fixed inset-0 z-50 flex items-center justify-center bg-black/40" >
+              <div className="w-full max-w-xl px-4 h-40 rounded-4xl bg-white flex flex-col gap-4 justify-center items-center">
+                <p className="text-2xl font-bold mb-2">
+                  Do you really want to do This?...
+                </p>
+                <div className="flex gap-4">
+                  <Button variant="destructive" 
+                          disabled={loading}
+                          onClick={async () => {
+                            setLoading(true);
+                            await handleAnalyze();
+                            setLoading(false);
+                            setOpen(false);
+                          }}
+                  >
+                    Continue
+                  </Button>
+
+                  <Button variant="secondary" onClick={() => setOpen(false)} className={'text-white'}>
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )
+        }
+
+        {
           viewTracks && (
-            <div className=" fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+            <div onClick={() => setOpen(false)} className=" fixed inset-0 z-50 flex items-center justify-center bg-black/40">
               <div className="w-full max-w-4xl px-4">
                 <DetailShow songs={newTracks} titles={'Top-Tracks'} Click={setViewTracks} callPage={callTracksPagination} nextData={next}/>
               </div>
@@ -121,7 +194,7 @@ export default function Dashboard() {
 
         {
           viewArtists && (
-            <div className=" fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+            <div onClick={() => setOpen(false)} className=" fixed inset-0 z-50 flex items-center justify-center bg-black/40">
               <div className="w-full max-w-4xl px-4">
                 <DetailShow songs={newArtists} titles={'Top-Artists'} Click={setViewArtists} callPage={callArtistsPagination} nextData={next}/>
               </div>
@@ -180,7 +253,26 @@ export default function Dashboard() {
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              <Button className="mt-6 w-full " onClick={handleAnalyze}>Tell Me</Button>
+              <Button className="mt-6 w-full " disabled={loading} 
+                      onClick={() => {
+                          type === 'critical' ? (
+                              setAnalysis(""),
+                              setOpen(true),
+                              setShowAnalysis(false)
+                            )
+                             : 
+                            (loading ? 
+                                    <SpinnerButton/> 
+                                    : 
+                                    (
+                                      setAnalysis(""),
+                                      handleAnalyze()
+                                    )
+                            )
+                      }
+              }>
+                Tell Me
+              </Button>
             </CardContent>
           </Card>
 

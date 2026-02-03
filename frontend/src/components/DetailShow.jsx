@@ -8,8 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
 const DetailShow = ({ songs, nextData, Click, callPage }) => {
   const [offset, setOffset] = useState(0);
 
-  console.log("songs :", songs)
-
   const next = offset + 20;
   const prev = offset - 20;
 

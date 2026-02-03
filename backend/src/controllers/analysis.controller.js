@@ -2,11 +2,12 @@
 import { buildAnalysisPrompt } from "../services/analysisPrompt.builder.js";
 import ListeningSummary from "../model/ListeningSummary.js";
 import openai from "../config/openai.js";
-
+import { mapSummaryToPrompt } from "../services/spotifySanitizer.js";
+import { runLLM } from "../utility/runLLM.js";
 
 export const analyzeListening = async (req, res) => {
   try {
-    const userId = req.user.id; // from verifySession middleware
+    const userId = req.session.sessionData.userMongoId; // from verifySession middleware
     const { type } = req.body;
 
     // 1. Validate input
@@ -21,29 +22,27 @@ export const analyzeListening = async (req, res) => {
       .sort({ createdAt: -1 })
       .lean();
 
+    // console.log("Sommory that we got from Analize Listening : ", summary)
+
     if (!summary) {
       return res.status(404).json({
         error: "Listening summary not found",
       });
     }
 
+    const promptSummary = mapSummaryToPrompt(summary);
+    // console.log(" we gate the prompt summary :", promptSummary)
+
     // 3. Build prompt
     const { system, user } = buildAnalysisPrompt({
-      listeningSummary: summary.data,
+      listeningSummary: promptSummary,
       analysisType: type,
     });
 
     // 4. Call OpenAI
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      temperature: type === "critical" ? 0.85 : 0.6,
-      messages: [
-        { role: "system", content: system },
-        { role: "user", content: user },
-      ],
-    });
+    const analysisText = await runLLM({ system, user, type });
 
-    const analysisText = completion.choices[0]?.message?.content;
+    console.log("analysis Text : ", analysisText)
 
     if (!analysisText) {
       throw new Error("Empty AI response");

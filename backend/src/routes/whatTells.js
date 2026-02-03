@@ -7,7 +7,7 @@ import ListeningSummary  from '../model/ListeningSummary.js';
 import { buildListeningSummary } from '../services/listeningSummary.builder.js';
 import refreshTokenValidate from '../middleware/refreshToken.js';
 import validateTimeRange from '../middleware/validateTimeRange.js';
-import { sanitizeSpotifyProfile } from '../services/spotifySanitizer.js';
+import { sanitizeSpotifyProfile, sanitizeTopArtists, sanitizeTopTracks } from '../services/spotifySanitizer.js';
 
 const router = express.Router();
 const SPOTIFY_BASE_API = process.env.SPOTIFY_BASE_API
@@ -22,13 +22,18 @@ router.post(
     try {
       const { time_range = "medium_term" } = req.time_range;
 
-      console.log("session USERID : ", req.session.sessionData.spotifyId, req.session.sessionData.access_token, userMongoId)
-
       if (!req.time_range || !time_range) {
         return res.status(400).json({ error: "time_range missing" });
       }
 
-      // 1. Fetch Spotify data (reuse logic or call internally)
+      // 1. Fetch Spotify Profile data 
+        const meRes = await axios.get(`${SPOTIFY_BASE_API}/me`, {
+          headers: {
+            Authorization: `Bearer ${req.session.sessionData.access_token}`,
+          },
+        });
+
+      // 1.2 Fetch Spotify data (reuse logic or call internally)
       const [artistsRes, tracksRes] = await Promise.all([
         axios.get(`${SPOTIFY_BASE_API}/me/top/artists`, {
           headers: {
@@ -45,19 +50,34 @@ router.post(
       ]);
 
       // 2. Sanitize
-      const sanitized = sanitizeSpotifyProfile({
-        artists: artistsRes.data.items,
-        tracks: tracksRes.data.items,
-      });
+      const  SanitizedProfile = sanitizeSpotifyProfile(meRes.data);
+
+      const SanitizedArtists = sanitizeTopArtists(artistsRes.data);
+
+      const SanitizedTracks = sanitizeTopTracks(tracksRes.data);
+
+      const sanitized = {
+        profile : SanitizedProfile,
+        artists: SanitizedArtists,
+        tracks : SanitizedTracks,
+      }
 
       // 3. Build summary
-      const summary = buildListeningSummary(sanitized);
+      const summary = buildListeningSummary({ sanitized });
+      // console.log("summory we got from the Route : ", summary)
 
+      const userId = req.session.sessionData.userMongoId;
       // 4. Save
-      await ListeningSummary.create({
-        userId: req.session.sessionData.spotifyId,
-        data: summary,
-      });
+      await ListeningSummary.findOneAndUpdate(
+          { userId },
+          {
+            $set: {
+              ...summary,
+              generatedAt: new Date(),
+            },
+          },
+          { new: true, upsert: true }
+        );
 
       return res.json({ success: true });
 

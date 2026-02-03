@@ -77,7 +77,7 @@ Top Genres:
 ${topGenres.join(", ")}
 
 Mood Profile:
-- Dominant moods: ${moodProfile.dominant.join(", ")}
+- Dominant moods: ${moodProfile?.dominant.join(", ")}
 - Emotional variance: ${moodProfile.variance}
 - Energy trend: ${moodProfile.energy}
 

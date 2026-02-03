@@ -1,8 +1,10 @@
 
 import axios from "axios";
 
+const api = import.meta.env.VITE_BACKEND_URL;
+
 const apiClient = axios.create({
-    baseURL : 'https://never-subintegumental-gavyn.ngrok-free.dev',
+    baseURL : api,
     withCredentials : true,
 })
 

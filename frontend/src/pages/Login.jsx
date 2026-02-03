@@ -2,13 +2,14 @@
 import { useContext } from "react";
 import { AuthContext } from "../auth/AuthProvider";
 import { Navigate } from "react-router-dom";
+import { SpinnerButton } from "@/components/SpinnerButton";
 
 const Login = () => {
 
     const { user, isLoading } = useContext(AuthContext);
 
     if ( isLoading ) {
-        return <div>Loading...</div>
+        return <div><SpinnerButton/></div>
     }
 
     if ( !user ) {

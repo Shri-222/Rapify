@@ -8,6 +8,7 @@ const MAX_GENRES = 5;
 //profile sanitization 
 
 export function sanitizeSpotifyProfile(profile) {
+
   if (!profile) return null;
 
   return {
@@ -67,3 +68,54 @@ export function sanitizeTopArtists(artistsResponse) {
       image: artist.images?.[0]?.url ?? null,
     }));
 }
+
+
+export function mapSummaryToPrompt(summary) {
+  return {
+    topGenres: summary.metrics?.dominantGenres ?? [],
+
+    moodProfile: {
+      dominant: inferMoods(summary.patterns?.emotionalBias),
+      variance: summary.patterns?.confidence ?? 0,
+      energy: summary.patterns?.emotionalBias ?? 0
+    },
+
+    audioProfile: {
+      energy: normalize(summary.metrics?.avgPopularity),
+      // danceability: 0.5, // placeholder (Spotify audio_features later)
+      valence: summary.patterns?.emotionalBias ?? 0,
+      tempo: inferTempo(summary.metrics?.avgDurationMs)
+    },
+
+    listeningHabits: {
+      repetition: summary.patterns?.confidence ?? 0,
+      exploration: 1 - (summary.patterns?.mainstreamScore ?? 0),
+      timeOfDay: "unknown"
+    },
+
+    artistPatterns: {
+      mainstream:
+        summary.patterns?.mainstreamScore > 0.6
+          ? "mainstream"
+          : "niche",
+      loyalty: summary.patterns?.confidence ?? 0
+    }
+  };
+}
+
+function inferMoods(emotionalBias = 0) {
+  if (emotionalBias > 0.4) return ["uplifting", "optimistic"];
+  if (emotionalBias < -0.4) return ["melancholic", "introspective"];
+  return ["balanced", "neutral"];
+}
+
+function inferTempo(durationMs = 0) {
+  if (durationMs < 180000) return "fast";
+  if (durationMs > 300000) return "slow";
+  return "moderate";
+}
+
+function normalize(value = 0, max = 100) {
+  return Math.min(value / max, 1);
+}
+

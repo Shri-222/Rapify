@@ -2,38 +2,47 @@
 import mongoose from 'mongoose';
 
 const ListeningSummarySchema = new mongoose.Schema({
-    userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-        index: true,
-    },
-    timeRange: String, // short_term / medium_term / long_term
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+    index: true,
+  },
 
-    totals: {
-        tracksAnalyzed: Number,
-        avgEnergy: Number,
-        avgValence: Number,
-        avgTempo: Number
-    },
+  user: {
+    spotifyId: String,
+    displayName: String,
+    country: String,
+    product: String,
+  },
 
-    moodDistribution: {
-        happy: Number,
-        sad: Number,
-        aggressive: Number,
-        calm: Number,
-        dark: Number
-    },
+  metrics: {
+    avgPopularity: Number,
+    avgDurationMs: Number,
+    explicitRatio: Number,
+    dominantArtists: [String],
+    dominantGenres: [String],
+  },
 
-    genreDistribution: {
-        genre: String,
-        percentage: Number
-    },
+  patterns: {
+    mainstreamScore: Number,
+    explicitBias: Number,
+    emotionalBias: Number,
+    confidence: Number,
+  },
 
-    explicitPreference: Number, // %
-    popularityBias: String, // mainstream / balanced / underground
+  personalityTraits: [String],
 
-    generatedAt: Date
-})
+  meta: {
+    mode: String,
+    confidenceScore: Number,
+  },
+
+  generatedAt: {
+    type: Date,
+    default: Date.now,
+  }
+});
+
 
 export default mongoose.model("ListeningSummary", ListeningSummarySchema);
