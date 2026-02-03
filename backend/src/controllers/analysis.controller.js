@@ -1,7 +1,6 @@
 
 import { buildAnalysisPrompt } from "../services/analysisPrompt.builder.js";
 import ListeningSummary from "../model/ListeningSummary.js";
-import openai from "../config/openai.js";
 import { mapSummaryToPrompt } from "../services/spotifySanitizer.js";
 import { runLLM } from "../utility/runLLM.js";
 
