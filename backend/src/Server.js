@@ -38,7 +38,7 @@ app.get("/health", (req, res) => {
 
 
 app.listen(PORT, () => {
-    console.log(`Server Is Running On http://localhost:${PORT} `);
+    console.log(`Server Is Running ${PORT} `);
 })
 
 DBConnect();

@@ -15,7 +15,7 @@ const buildSpotifyAuthURL = ( { CLIENT_ID, REDIRECT_URI } ) => {
         response_type : 'code',
         client_id : CLIENT_ID,
         scope : scope,
-        redirect_uri : REDIRECT_URI,
+        redirect_uri : encodeURIComponent(REDIRECT_URI),
         show_dialog : true
     });
 
