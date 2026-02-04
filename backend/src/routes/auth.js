@@ -114,14 +114,12 @@ router.get('/callback', async (req, res) => {
         }
 
         res
-            .status(200)
             .cookie(
-            'session_id',
-            sessionId,
-            options
-        )
-
-        res.redirect(`${FRONTEND_URL}/login-success`)       
+                'session_id',
+                sessionId,
+                options
+            )
+            .redirect(`${FRONTEND_URL}/login-success`)       
 
     } catch (error) {
         console.log('Callback Error : ', error);
