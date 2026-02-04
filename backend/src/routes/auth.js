@@ -120,7 +120,7 @@ router.get('/callback', async (req, res) => {
             options
         )
 
-        res.redirect('http://localhost:5173/login-success')       
+        res.redirect(`${FRONTEND_URL}/login-success`)       
 
     } catch (error) {
         console.log('Callback Error : ', error);
