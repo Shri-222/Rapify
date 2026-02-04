@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import useAuth from "@/auth/useAuth";
-import TopBar from "@/components/topBar";
+import TopBar from "@/components/TopBar";
 import {
   DropdownMenu,
   DropdownMenuContent,
