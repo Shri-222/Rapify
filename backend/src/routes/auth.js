@@ -77,7 +77,7 @@ router.get('/callback', async (req, res) => {
             return res.status(400).send('Failed to retrieve Spotify User ID');
         }
 
-        const user = await User.findOne({ userId : spotifyId });
+        let user = await User.findOne({ userId : spotifyId });
         
         if ( !user ) {
             user = new User({
