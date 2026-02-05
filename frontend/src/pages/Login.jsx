@@ -16,9 +16,9 @@ const Login = () => {
        return (
             <div>
                 <button
-                    onClick={
-                        window.location.href = `${import.meta.env.VITE_BACKEND_URL}/auth/login` 
-                    }
+                    onClick={() => {
+                                window.location.href = `${import.meta.env.VITE_BACKEND_URL}/auth/login`;
+                            }}
                 >Login with Spotify</button>
             </div>
         ) 

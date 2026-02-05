@@ -35,24 +35,22 @@ const AuthProvider = ({ children }) => {
    }, []);
 
     useEffect(() => {
-        const getTracksAndArtiste = async() => {
-            try {
+        if (!user) return;
 
-                const artistes = await apiClient.get('/spotify/top-artists')
-                setArtists(artistes);
-                
-                const tracks = await apiClient.get('/spotify/top-tracks');
-                setTracks(tracks)
-                
+        const getTracksAndArtiste = async () => {
+            try {
+            const artistes = await apiClient.get('/spotify/top-artists');
+            setArtists(artistes.data);
+
+            const tracks = await apiClient.get('/spotify/top-tracks');
+            setTracks(tracks.data);
             } catch (error) {
-                console.log('AuthProvider Error : ', error);
-                setArtists(null);
-                setTracks(null);
+            console.log('Tracks Error:', error);
             }
-        }
+        };
 
         getTracksAndArtiste();
-    }, []);
+    }, [user]);
 
     const value = {
             user,
