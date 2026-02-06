@@ -41,11 +41,11 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (artists) {
-      setNewArtists(artists.data.items)
+      setNewArtists(artists.items)
     }
 
     if (tracks) {
-      setNewTracks(tracks.data.items)
+      setNewTracks(tracks.items)
     }
   }, [tracks, artists]);
 

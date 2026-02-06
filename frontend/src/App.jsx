@@ -6,13 +6,16 @@ import Dashboard from "./pages/Dashboard.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import useAuth from "./auth/useAuth.js";
 import LoginSuccess from './pages/LoginSuccess.jsx'
+import { SpinnerButton } from './components/SpinnerButton';
 
 
 function App() {
   const { user, isLoading } = useAuth();
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div>
+      <SpinnerButton/>
+    </div>;
   }
 
   return (
