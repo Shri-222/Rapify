@@ -42,7 +42,7 @@ router.get('/callback', async (req, res) => {
             querystring.stringify({
                 grant_type : 'authorization_code',
                 code : code,
-                redirect_uri : REDIRECT_URI
+                redirect_uri : REDIRECT_URI 
             }),
 
             {
@@ -119,7 +119,7 @@ router.get('/callback', async (req, res) => {
                 sessionId,
                 options
             )
-            .redirect(`${FRONTEND_URL}/login-success`)       
+            .redirect(`http://localhost:5173/login-success`)       
 
     } catch (error) {
         console.log('Callback Error : ', error);

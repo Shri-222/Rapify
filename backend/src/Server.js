@@ -20,7 +20,10 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors(
     {
-        origin : 'https://rapify.pages.dev',
+        origin : [
+            'https://rapify.pages.dev',
+            'http://localhost:5173'
+        ],
         credentials : true
     }
 ));
